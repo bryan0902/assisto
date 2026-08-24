@@ -4,6 +4,10 @@
 
 [Español](#español) · [English](#english)
 
+### 🔗 Demo en vivo — [assisto.onrender.com](https://assisto.onrender.com)
+
+Entra con `superadmin / admin123`. Alojado en plan gratuito: la primera carga puede tardar ~30 segundos mientras el servicio despierta, y los datos se reinician periódicamente.
+
 ![Dashboard](docs/img/dashboard-superadmin.png)
 
 ---
@@ -64,6 +68,7 @@ Cada materia puede tener varios bloques de horario; el sistema los muestra como 
 | Autenticación | JWT (`jsonwebtoken`) · hash de contraseñas con `bcryptjs` |
 | Frontend | JavaScript sin framework (SPA) · Chart.js · jsPDF |
 | Configuración | Variables de entorno con `dotenv` |
+| Despliegue | Render (plan gratuito) |
 
 **Por qué SQLite y no PostgreSQL:** el sistema fue pensado para correr en un servidor local dentro de la propia institución, sin infraestructura adicional ni administrador de base de datos. SQLite es un solo archivo, no requiere servicio aparte y soporta sin problema la carga de un plantel. Si el proyecto creciera a operación multi-institucional concurrente, migrar a PostgreSQL sería el siguiente paso.
 
@@ -135,14 +140,20 @@ Vale la pena ser explícito sobre lo que falta:
 
 Proyecto desarrollado para la asignatura de **Arquitectura de la Información** de la licenciatura en Ingeniería en Sistemas Computacionales.
 
-- [Bryan](https://github.com/bryan0902)
-- [Mariana Olvera](https://github.com/marianaolveralopez7-art)
+| | |
+|---|---|
+| [Bryan](https://github.com/bryan0902) | Desarrollo backend y frontend: API REST, autenticación JWT, control de acceso por rol, lógica de reportes e integración con la base de datos. |
+| [Mariana Olvera](https://github.com/marianaolveralopez7-art) | Diseño del modelo de datos y arquitectura de la interfaz: estructura de tablas y relaciones, sistema visual, navegación y disposición de pantallas. |
 
 Los nombres de institución, campus, personas y direcciones que aparecen en los datos de demostración son ficticios.
 
 ---
 
 ## English
+
+### 🔗 Live demo — [assisto.onrender.com](https://assisto.onrender.com)
+
+Sign in with `superadmin / admin123`. Hosted on a free tier: the first load may take ~30 seconds while the service wakes up, and data resets periodically.
 
 ### The problem
 
@@ -182,6 +193,7 @@ Restrictions are enforced server-side, inside the SQL queries — not merely by 
 | Authentication | JWT (`jsonwebtoken`) · password hashing via `bcryptjs` |
 | Frontend | Vanilla JavaScript (SPA) · Chart.js · jsPDF |
 | Configuration | Environment variables via `dotenv` |
+| Deployment | Render (free tier) |
 
 **Why SQLite over PostgreSQL:** the system was designed to run on a local server inside the institution itself, with no extra infrastructure or database administrator. SQLite is a single file, needs no separate service, and comfortably handles a single campus's load. Scaling to concurrent multi-institution operation would make PostgreSQL the next step.
 
@@ -253,7 +265,9 @@ Worth being explicit about what's missing:
 
 Built for the **Information Architecture** course of the Computer Systems Engineering degree.
 
-- [Bryan](https://github.com/bryan0902)
-- [Mariana Olvera](https://github.com/marianaolveralopez7-art)
+| | |
+|---|---|
+| [Bryan](https://github.com/bryan0902) | Backend and frontend development: REST API, JWT authentication, role-based access control, reporting logic and database integration. |
+| [Mariana Olvera](https://github.com/marianaolveralopez7-art) | Data model and interface architecture: table structure and relationships, visual system, navigation and screen layout. |
 
 Institution, campus, people and address names appearing in the demo data are fictional.
