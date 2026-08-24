@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assisto — Sistema Institucional de Asistencia</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════  LOGIN  ═══════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-bg">
+    <div class="login-blob blob1"></div>
+    <div class="login-blob blob2"></div>
+    <div class="login-blob blob3"></div>
+  </div>
+  <div class="login-split">
+    <div class="login-hero">
+      <div class="hero-content">
+        <div class="hero-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="38" height="38">
+            <path d="M10 10 L10 30 Q10 40 24 40 Q38 40 38 30 L38 10" stroke="#003087" stroke-width="6" stroke-linecap="round" fill="none"/>
+            <circle cx="24" cy="10" r="4.5" fill="#003087"/>
+          </svg>
+        </div>
+        <h1 class="hero-title">Assisto</h1>
+        <p class="hero-desc">Sistema Institucional de Control de Asistencia</p>
+        <div class="hero-features">
+          <div class="hero-feat"><i class="fas fa-check-circle"></i> Pase de lista digital por código</div>
+          <div class="hero-feat"><i class="fas fa-check-circle"></i> Gestión de roles y permisos</div>
+          <div class="hero-feat"><i class="fas fa-check-circle"></i> Reportes y estadísticas en tiempo real</div>
+          <div class="hero-feat"><i class="fas fa-check-circle"></i> Exportación a PDF</div>
+        </div>
+        <div class="hero-version">v2.0 · Modo Local</div>
+      </div>
+    </div>
+    <div class="login-form-side">
+      <div class="login-card">
+        <div class="login-brand">
+          <div class="brand-icon">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+            <path d="M8 8 L8 22 Q8 30 18 30 Q28 30 28 22 L28 8" stroke="#003087" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <circle cx="18" cy="8" r="3" fill="#003087"/>
+          </svg>
+        </div>
+          <div>
+            <h2 class="brand-name">Assisto</h2>
+            <p class="brand-sub">Acceso al sistema Assisto</p>
+          </div>
+        </div>
+        <form id="login-form" onsubmit="return false;">
+          <div class="field-group">
+            <label class="field-label">Usuario</label>
+            <div class="field-wrap">
+              <i class="fas fa-user field-icon"></i>
+              <input type="text" id="login-user" class="field-input" placeholder="Ingresa tu usuario" autocomplete="username" />
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Contraseña</label>
+            <div class="field-wrap">
+              <i class="fas fa-lock field-icon"></i>
+              <input type="password" id="login-pass" class="field-input" placeholder="••••••••" autocomplete="current-password" />
+              <button type="button" class="toggle-pass" onclick="togglePassword()"><i class="fas fa-eye" id="eye-icon"></i></button>
+            </div>
+          </div>
+          <div id="login-error" class="login-error hidden"></div>
+          <button type="submit" class="btn-login" id="btn-login" onclick="handleLogin()">
+            <span id="btn-login-text">Iniciar Sesión</span>
+            <i class="fas fa-arrow-right" id="btn-login-icon"></i>
+          </button>
+        </form>
+        <div class="login-creds">
+          <p class="creds-title">Credenciales de demostración</p>
+          <div class="creds-grid">
+            <div class="cred-item" onclick="fillCred('superadmin','admin123')"><span class="cred-role superadmin">Super Admin</span><code>superadmin / admin123</code></div>
+            <div class="cred-item" onclick="fillCred('director1','dir123')"><span class="cred-role director">Director</span><code>director1 / dir123</code></div>
+            <div class="cred-item" onclick="fillCred('docente1','doc123')"><span class="cred-role docente">Docente</span><code>docente1 / doc123</code></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════  APP  ═══════════════════════ -->
+<div id="screen-app" class="screen">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="s-icon s-icon-unitec">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22">
+            <path d="M8 8 L8 22 Q8 30 18 30 Q28 30 28 22 L28 8" stroke="#FFCC00" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+            <circle cx="18" cy="8" r="3" fill="#FFCC00"/>
+          </svg>
+        </div>
+        <div class="s-brand-text">
+          <span class="s-name">Assisto</span>
+          <span class="s-unitec">INSTITUTO DEMO</span>
+        </div>
+      </div>
+      <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    </div>
+    <div class="user-badge" id="user-badge">
+      <div class="ub-avatar" id="ub-avatar">SA</div>
+      <div class="ub-info">
+        <div class="ub-name" id="ub-name">Usuario</div>
+        <div class="ub-role" id="ub-role">Rol</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <button class="btn-logout" onclick="handleLogout()">
+      <i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span>
+    </button>
+  </aside>
+
+  <main class="main-content" id="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="topbar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="breadcrumb" id="breadcrumb">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbar-date"></div>
+        <div class="topbar-user" id="topbar-user"></div>
+      </div>
+    </div>
+
+    <div id="views-container">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div id="dash-alerta-profs" style="display:none;margin-bottom:.5rem"></div>
+        <div class="view-header">
+          <div><h2 class="view-title">Panel Principal</h2><p class="view-sub" id="dash-fecha"></p></div>
+        </div>
+        <div class="stats-grid" id="stats-grid"></div>
+        <div class="dashboard-grid">
+          <div class="card"><div class="card-header"><h3><i class="fas fa-clock"></i> Actividad Reciente</h3></div><div class="card-body" id="recent-activity"></div></div>
+          <div class="card"><div class="card-header"><h3><i class="fas fa-chart-bar"></i> Asistencia Semanal</h3><span id="chart-legend" style="font-size:.72rem;color:var(--text-light)"></span></div><div class="card-body" id="weekly-chart"></div></div>
+        </div>
+        <div class="dashboard-charts-row">
+          <div class="card">
+            <div class="card-header"><h3><i class="fas fa-chart-line"></i> Tendencia de Asistencia — Últimos 30 días</h3></div>
+            <div class="card-body" style="padding:.8rem"><canvas id="chart-tendencia" height="130"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3><i class="fas fa-chart-pie"></i> Distribución de Estatus</h3></div>
+            <div class="card-body chart-donut-wrap"><canvas id="chart-donut" height="160"></canvas><div id="donut-legend"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- USUARIOS -->
+      <div class="view" id="view-usuarios">
+        <div class="view-header">
+          <div><h2 class="view-title">Gestión de Usuarios</h2><p class="view-sub">Control de acceso al sistema</p></div>
+          <button class="btn-primary" onclick="openModal('modal-usuario',true)"><i class="fas fa-plus"></i> Nuevo Usuario</button>
+        </div>
+        <div class="card">
+          <div class="card-toolbar">
+            <input type="text" class="search-input" placeholder="Buscar usuario..." oninput="filterTable('tbl-usuarios',this.value)" />
+            <select class="filter-select" onchange="filterByAttr('tbl-usuarios',3,this.value)">
+              <option value="">Todos los roles</option>
+              <option value="Super Admin">Super Admin</option>
+              <option value="Director">Director</option>
+              <option value="Docente">Docente</option>
+            </select>
+          </div>
+          <div class="table-wrap"><table class="data-table" id="tbl-usuarios">
+            <thead><tr><th>#</th><th>Nombre</th><th>Usuario</th><th>Rol</th><th>Campus</th><th>Estado</th><th>Último Acceso</th><th>Acciones</th></tr></thead>
+            <tbody id="tbody-usuarios"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- PROFESORES -->
+      <div class="view" id="view-profesores">
+        <div class="view-header">
+          <div><h2 class="view-title">Gestión de Profesores</h2><p class="view-sub">Alta y baja de docentes</p></div>
+          <button class="btn-primary" onclick="openModal('modal-profesor',true)"><i class="fas fa-plus"></i> Nuevo Profesor</button>
+        </div>
+        <div class="card">
+          <div class="card-toolbar"><input type="text" class="search-input" placeholder="Buscar profesor..." oninput="filterTable('tbl-profesores',this.value)" /></div>
+          <div class="table-wrap"><table class="data-table" id="tbl-profesores">
+            <thead><tr><th>#</th><th>Nombre</th><th>Email</th><th>Especialidad</th><th>Materias</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="tbody-profesores"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- ALUMNOS -->
+      <div class="view" id="view-alumnos">
+        <div class="view-header">
+          <div><h2 class="view-title">Gestión de Alumnos</h2><p class="view-sub">Registro de estudiantes</p></div>
+          <div class="btn-group">
+            <button class="btn-secondary" onclick="openModal('modal-importar-csv',true)"><i class="fas fa-file-csv"></i> Importar CSV</button>
+            <button class="btn-primary" onclick="openModal('modal-alumno',true)"><i class="fas fa-plus"></i> Nuevo Alumno</button>
+          </div>
+        </div>
+
+        <!-- Barra de acciones masivas (aparece cuando hay selección) -->
+        <div class="bulk-bar" id="bulk-bar" style="display:none">
+          <span id="bulk-count" class="bulk-count">0 seleccionados</span>
+          <div class="btn-group">
+            <button class="btn-ghost" onclick="openAsignarGrupo()"><i class="fas fa-users"></i> Asignar Grupo</button>
+            <button class="btn-ghost" onclick="openAsignarMaterias()"><i class="fas fa-book"></i> Asignar Materias</button>
+            <button class="btn-ghost btn-danger" onclick="deseleccionarTodos()"><i class="fas fa-times"></i> Cancelar</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-toolbar">
+            <input type="checkbox" id="check-all" title="Seleccionar todos" onchange="toggleSelectAll(this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--navy)" />
+            <input type="text" class="search-input" placeholder="Buscar alumno o matrícula..." oninput="filterTable('tbl-alumnos',this.value)" />
+            <select class="filter-select" id="filter-grupo-alumnos" onchange="reloadAlumnos(this.value)">
+              <option value="">Todos los grupos</option>
+            </select>
+            <span id="alumnos-count" style="font-size:.8rem;color:var(--text-sub);margin-left:auto"></span>
+          </div>
+          <div class="table-wrap"><table class="data-table" id="tbl-alumnos">
+            <thead><tr><th style="width:36px"></th><th>Matrícula</th><th>Nombre</th><th>Grupo</th><th>Email</th><th>Tutor</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="tbody-alumnos"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- GRUPOS Y MATERIAS -->
+      <div class="view" id="view-grupos">
+        <div class="view-header">
+          <div><h2 class="view-title">Grupos y Materias</h2></div>
+          <div class="btn-group">
+            <button class="btn-primary"   onclick="openModal('modal-grupo',true)"><i class="fas fa-plus"></i> Nuevo Grupo</button>
+            <button class="btn-secondary" onclick="openModal('modal-materia',true)"><i class="fas fa-plus"></i> Nueva Materia</button>
+          </div>
+        </div>
+        <div class="two-col-grid">
+          <div class="card"><div class="card-header"><h3><i class="fas fa-users"></i> Grupos Activos</h3></div><div class="card-body" id="list-grupos"></div></div>
+          <div class="card"><div class="card-header"><h3><i class="fas fa-book"></i> Materias</h3></div><div class="card-body" id="list-materias"></div></div>
+        </div>
+      </div>
+
+      <!-- PASE DE LISTA -->
+      <div class="view" id="view-asistencia">
+        <div class="view-header">
+          <div><h2 class="view-title">Pase de Lista</h2><p class="view-sub" id="asistencia-fecha"></p></div>
+          <button class="btn-ghost" id="btn-volver-menu" style="display:none" onclick="volverMenuMaterias()">
+            <i class="fas fa-arrow-left"></i> Mis Materias
+          </button>
+        </div>
+
+        <!-- Menú de materias (solo docentes) -->
+        <div id="menu-materias-docente" style="display:none"></div>
+
+        <!-- Selector normal (admin/director y docente tras elegir materia) -->
+        <div class="card selector-card" id="selector-card-admin">
+          <div class="selector-grid">
+            <div class="field-group">
+              <label class="field-label"><i class="fas fa-qrcode"></i> Código de Materia</label>
+              <div class="field-wrap">
+                <i class="fas fa-search field-icon"></i>
+                <input type="text" id="input-codigo-materia" class="field-input" placeholder="Ej: SIS-301" oninput="buscarPorCodigo(this.value)" style="text-transform:uppercase" />
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label"><i class="fas fa-book"></i> Materia</label>
+              <select class="field-input" id="sel-materia" onchange="onMateriaChange()">
+                <option value="">— Selecciona materia —</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label"><i class="fas fa-users"></i> Grupo</label>
+              <select class="field-input" id="sel-grupo-asistencia">
+                <option value="">— Selecciona grupo —</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label"><i class="fas fa-calendar"></i> Fecha</label>
+              <input type="date" id="input-fecha-asistencia" class="field-input" />
+            </div>
+          </div>
+          <button class="btn-primary" onclick="loadLista()"><i class="fas fa-list-check"></i> Cargar Lista</button>
+        </div>
+
+        <div class="card" id="lista-container" style="display:none">
+          <div id="horarios-info-lista" style="display:none;flex-wrap:wrap;gap:.4rem;padding:.4rem 0 .6rem"></div>
+          <div class="lista-header">
+            <div class="lista-info" id="lista-info"></div>
+            <div class="lista-actions">
+              <button class="btn-ghost"            onclick="marcarTodos('P')"><i class="fas fa-check-double"></i> Todos Presentes</button>
+              <button class="btn-ghost btn-danger" onclick="marcarTodos('A')"><i class="fas fa-times"></i> Todos Ausentes</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="tbl-asistencia">
+              <thead><tr><th>#</th><th>Matrícula</th><th>Nombre</th><th title="Presente">P</th><th title="Tardanza">T</th><th title="Ausente">A</th><th title="Justificada">J</th><th>Nota</th></tr></thead>
+              <tbody id="tbody-asistencia"></tbody>
+            </table>
+          </div>
+          <div class="lista-footer">
+            <button class="btn-primary btn-lg" onclick="guardarAsistencia()"><i class="fas fa-save"></i> Guardar Asistencia</button>
+            <button class="btn-secondary"       onclick="exportarListaPDF()"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTES -->
+      <div class="view" id="view-reportes">
+        <div class="view-header"><h2 class="view-title">Reportes de Asistencia</h2></div>
+        <div class="card">
+          <div class="card-toolbar reporte-filtros">
+            <select class="filter-select" id="rep-materia"><option value="">Todas las materias</option></select>
+            <select class="filter-select" id="rep-grupo"><option value="">Todos los grupos</option></select>
+            <input type="date" class="field-input small" id="rep-fecha-ini" />
+            <span style="color:var(--text-sub);font-size:.82rem">al</span>
+            <input type="date" class="field-input small" id="rep-fecha-fin" />
+            <button class="btn-primary" onclick="generarReporte()"><i class="fas fa-chart-bar"></i> Generar</button>
+          </div>
+        </div>
+        <div id="reporte-resultado"></div>
+      </div>
+
+      <!-- CAMPUS -->
+      <div class="view" id="view-campus">
+        <div class="view-header">
+          <div><h2 class="view-title">Campus</h2><p class="view-sub">Gestión de planteles y sedes</p></div>
+          <button class="btn-primary" onclick="openModal('modal-campus',true)"><i class="fas fa-plus"></i> Nuevo Campus</button>
+        </div>
+        <div id="grid-campus" class="campus-grid"></div>
+      </div>
+
+      <!-- CUATRIMESTRES -->
+      <div class="view" id="view-cuatrimestres">
+        <div class="view-header">
+          <div><h2 class="view-title">Cuatrimestres</h2><p class="view-sub">Gestión de períodos académicos 2026</p></div>
+          <button class="btn-primary" onclick="openModal('modal-cuatrimestre',true)"><i class="fas fa-plus"></i> Nuevo Cuatrimestre</button>
+        </div>
+        <div class="card" id="card-cuatrimestres">
+          <div class="card-body" id="list-cuatrimestres"></div>
+        </div>
+      </div>
+
+    </div><!-- /views-container -->
+  </main>
+</div><!-- /screen-app -->
+
+<!-- ═══════════════════════  MODALS  ═══════════════════════ -->
+<div id="modal-overlay" class="modal-overlay" onclick="closeAllModals(event)">
+
+  <!-- Modal Usuario -->
+  <div class="modal" id="modal-usuario">
+    <div class="modal-header">
+      <h3 id="tit-usuario">Nuevo Usuario</h3>
+      <button class="modal-close" onclick="closeModal('modal-usuario')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="u-id" />
+      <div class="form-grid">
+        <div class="field-group span-2">
+          <label class="field-label">Nombre completo *</label>
+          <input type="text" id="u-nombre" class="field-input" placeholder="Ej: Ing. Carlos Mendoza" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Usuario *</label>
+          <input type="text" id="u-username" class="field-input" placeholder="cmendoza" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Contraseña <small style="color:var(--text-light)">(vacío = sin cambio al editar)</small></label>
+          <input type="password" id="u-pass" class="field-input" placeholder="••••••••" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Email</label>
+          <input type="email" id="u-email" class="field-input" placeholder="usuario@instituto-demo.edu" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Rol *</label>
+          <select id="u-rol" class="field-input">
+            <option value="superadmin">Super Administrador</option>
+            <option value="director">Director</option>
+            <option value="docente">Docente</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Campus asignado</label>
+          <select id="u-campus" class="field-input">
+            <option value="">— Sin campus (Super Admin) —</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Estado</label>
+          <select id="u-estado" class="field-input">
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+      </div>
+      <!-- Sección permisos de campus (solo visible para directores) -->
+      <div id="u-campus-permisos-section" style="display:none;margin-top:1rem">
+        <div style="border-top:1px solid var(--border);padding-top:.8rem">
+          <label class="field-label" style="margin-bottom:.5rem">
+            <i class="fas fa-shield-alt" style="color:var(--unitec-blue)"></i>
+            Campus adicionales autorizados
+            <small style="font-weight:400;color:var(--text-light)"> (el director podrá gestionar estos campus también)</small>
+          </label>
+          <div id="u-campus-permisos-list" style="display:flex;flex-wrap:wrap;gap:.4rem;padding:.4rem 0"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-usuario')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarUsuario()"><i class="fas fa-save"></i> Guardar</button>
+    </div>
+  </div>
+
+  <!-- Modal Profesor -->
+  <div class="modal" id="modal-profesor">
+    <div class="modal-header"><h3 id="tit-profesor">Nuevo Profesor</h3><button class="modal-close" onclick="closeModal('modal-profesor')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="p-id" />
+      <div class="form-grid">
+        <div class="field-group span-2"><label class="field-label">Nombre completo</label><input type="text" id="p-nombre" class="field-input" /></div>
+        <div class="field-group"><label class="field-label">Email institucional</label><input type="email" id="p-email" class="field-input" /></div>
+        <div class="field-group"><label class="field-label">Teléfono</label><input type="tel" id="p-tel" class="field-input" /></div>
+        <div class="field-group"><label class="field-label">Cédula profesional</label><input type="text" id="p-cedula" class="field-input" /></div>
+        <div class="field-group"><label class="field-label">Especialidad</label><input type="text" id="p-especialidad" class="field-input" /></div>
+        <div class="field-group"><label class="field-label">Estado</label><select id="p-estado" class="field-input"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn-ghost" onclick="closeModal('modal-profesor')">Cancelar</button><button class="btn-primary" onclick="guardarProfesor()"><i class="fas fa-save"></i> Guardar</button></div>
+  </div>
+
+  <!-- Modal Alumno -->
+  <div class="modal" id="modal-alumno">
+    <div class="modal-header"><h3 id="tit-alumno">Nuevo Alumno</h3><button class="modal-close" onclick="closeModal('modal-alumno')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="a-id" />
+      <div class="form-grid">
+        <div class="field-group"><label class="field-label">Matrícula</label><input type="text" id="a-matricula" class="field-input" /></div>
+        <div class="field-group span-2"><label class="field-label">Nombre completo</label><input type="text" id="a-nombre" class="field-input" /></div>
+        <div class="field-group"><label class="field-label">Email</label><input type="email" id="a-email" class="field-input" /></div>
+        <div class="field-group"><label class="field-label">Teléfono</label><input type="tel" id="a-tel" class="field-input" /></div>
+        <div class="field-group"><label class="field-label">Grupo</label><select id="a-grupo" class="field-input"></select></div>
+        <div class="field-group"><label class="field-label">Tutor / Padre</label><input type="text" id="a-tutor" class="field-input" /></div>
+        <div class="field-group"><label class="field-label">Tel. Tutor</label><input type="tel" id="a-tel-tutor" class="field-input" /></div>
+        <div class="field-group"><label class="field-label">Estado</label><select id="a-estado" class="field-input"><option value="activo">Activo</option><option value="inactivo">Inactivo</option><option value="baja">Baja</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn-ghost" onclick="closeModal('modal-alumno')">Cancelar</button><button class="btn-primary" onclick="guardarAlumno()"><i class="fas fa-save"></i> Guardar</button></div>
+  </div>
+
+  <!-- Modal Grupo -->
+  <div class="modal modal-sm" id="modal-grupo">
+    <div class="modal-header"><h3>Grupo</h3><button class="modal-close" onclick="closeModal('modal-grupo')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="g-id" />
+      <div class="field-group"><label class="field-label">Nombre del grupo</label><input type="text" id="g-nombre" class="field-input" placeholder="Ej: 3°A Sistemas" /></div>
+      <div class="field-group"><label class="field-label">Turno</label><select id="g-turno" class="field-input"><option>Matutino</option><option>Vespertino</option><option>Mixto</option></select></div>
+      <div class="field-group"><label class="field-label">Carrera / Área</label><input type="text" id="g-carrera" class="field-input" /></div>
+      <div class="form-grid" style="margin-top:.5rem">
+        <div class="field-group"><label class="field-label">Semestre</label><input type="number" id="g-semestre" class="field-input" value="1" min="1" max="12" /></div>
+        <div class="field-group"><label class="field-label">Capacidad</label><input type="number" id="g-capacidad" class="field-input" value="30" min="5" max="60" /></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn-ghost" onclick="closeModal('modal-grupo')">Cancelar</button><button class="btn-primary" onclick="guardarGrupo()"><i class="fas fa-save"></i> Guardar</button></div>
+  </div>
+
+  <!-- Modal Materia -->
+  <div class="modal" id="modal-materia">
+    <div class="modal-header">
+      <h3 id="tit-materia">Nueva Materia</h3>
+      <button class="modal-close" onclick="closeModal('modal-materia')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="m-id" />
+      <div class="field-group">
+        <label class="field-label"><i class="fas fa-book-open" style="color:var(--unitec-blue)"></i> Catálogo institucional (opcional)</label>
+        <select id="m-catalogo" class="field-input" onchange="autorellenarMateria(this)">
+          <option value="">— Materia personalizada / nueva —</option>
+        </select>
+        <small style="color:var(--text-light);font-size:.73rem">Selecciona del catálogo para auto-rellenar los campos.</small>
+      </div>
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Código único *</label>
+          <input type="text" id="m-codigo" class="field-input" placeholder="SIS-301" style="text-transform:uppercase" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Nombre de la materia *</label>
+          <input type="text" id="m-nombre" class="field-input" placeholder="Programación Avanzada" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Créditos</label>
+          <input type="number" id="m-creditos" class="field-input" value="4" min="1" max="10" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Horas / semana</label>
+          <input type="number" id="m-horas" class="field-input" value="4" min="1" max="20" />
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label"><i class="fas fa-chalkboard-teacher" style="color:var(--unitec-blue)"></i> Docente asignado</label>
+        <select id="m-profesor" class="field-input">
+          <option value="">— Sin docente asignado —</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-materia')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarMateria()"><i class="fas fa-save"></i> Guardar</button>
+    </div>
+  </div>
+
+  <!-- Modal Importar CSV -->
+  <div class="modal" id="modal-importar-csv">
+    <div class="modal-header"><h3><i class="fas fa-file-csv"></i> Importar Alumnos desde CSV</h3><button class="modal-close" onclick="closeModal('modal-importar-csv')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <div class="csv-info">
+        <p style="font-size:.85rem;color:var(--text-sub);margin-bottom:.8rem">El archivo CSV debe tener estas columnas (la primera fila es el encabezado):</p>
+        <code class="csv-code">matricula, nombre, email, telefono, tutor</code>
+        <p style="font-size:.78rem;color:var(--text-light);margin-top:.5rem">Solo <strong>matricula</strong> y <strong>nombre</strong> son obligatorios.</p>
+      </div>
+      <div class="field-group" style="margin-top:1rem">
+        <label class="field-label">Grupo al que se asignarán</label>
+        <select id="csv-grupo" class="field-input"></select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Archivo CSV</label>
+        <div class="csv-drop-zone" id="csv-drop-zone" onclick="document.getElementById('csv-file-input').click()">
+          <i class="fas fa-cloud-upload-alt" style="font-size:2rem;color:var(--text-light);margin-bottom:.5rem"></i>
+          <p style="font-size:.85rem;color:var(--text-sub)">Haz clic para seleccionar o arrastra el archivo aquí</p>
+          <p id="csv-file-name" style="font-size:.8rem;color:var(--navy-mid);font-weight:600;margin-top:.3rem"></p>
+        </div>
+        <input type="file" id="csv-file-input" accept=".csv,.txt" style="display:none" onchange="leerCSV(this)" />
+      </div>
+      <div id="csv-preview" style="display:none">
+        <div class="csv-preview-header">
+          <span id="csv-preview-count"></span>
+          <button class="btn-ghost" style="padding:.3rem .7rem;font-size:.78rem" onclick="limpiarCSV()"><i class="fas fa-times"></i> Limpiar</button>
+        </div>
+        <div class="table-wrap" style="max-height:200px;overflow-y:auto">
+          <table class="data-table" style="font-size:.8rem">
+            <thead><tr><th>#</th><th>Matrícula</th><th>Nombre</th><th>Email</th><th>Tutor</th></tr></thead>
+            <tbody id="csv-preview-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-importar-csv')">Cancelar</button>
+      <button class="btn-primary" onclick="importarCSV()"><i class="fas fa-upload"></i> Importar</button>
+    </div>
+  </div>
+
+  <!-- Modal Asignar Grupo masivo -->
+  <div class="modal modal-sm" id="modal-asignar-grupo">
+    <div class="modal-header"><h3>Asignar Grupo</h3><button class="modal-close" onclick="closeModal('modal-asignar-grupo')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <p id="asignar-grupo-desc" style="font-size:.85rem;color:var(--text-sub);margin-bottom:1rem"></p>
+      <div class="field-group">
+        <label class="field-label">Grupo destino</label>
+        <select id="asignar-grupo-sel" class="field-input"></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-asignar-grupo')">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarAsignarGrupo()"><i class="fas fa-check"></i> Asignar</button>
+    </div>
+  </div>
+
+  <!-- Modal Asignar Materias masivo -->
+  <div class="modal" id="modal-asignar-materias">
+    <div class="modal-header"><h3>Asignar Materias</h3><button class="modal-close" onclick="closeModal('modal-asignar-materias')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <p id="asignar-mat-desc" style="font-size:.85rem;color:var(--text-sub);margin-bottom:1rem"></p>
+      <div class="field-group">
+        <label class="field-label">Selecciona las materias a asignar</label>
+        <div id="materias-checklist" class="materias-checklist"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-asignar-materias')">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarAsignarMaterias()"><i class="fas fa-check"></i> Asignar</button>
+    </div>
+  </div>
+
+  <!-- Modal Cuatrimestre -->
+  <div class="modal modal-sm" id="modal-cuatrimestre">
+    <div class="modal-header">
+      <h3 id="tit-cuatrimestre">Nuevo Cuatrimestre</h3>
+      <button class="modal-close" onclick="closeModal('modal-cuatrimestre')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cuat-id" />
+      <div class="field-group">
+        <label class="field-label">Número de cuatrimestre</label>
+        <select id="cuat-numero" class="field-input">
+          <option value="1">Cuatrimestre 1 (Enero – Abril)</option>
+          <option value="2">Cuatrimestre 2 (Mayo – Agosto)</option>
+          <option value="3">Cuatrimestre 3 (Septiembre – Diciembre)</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Año</label>
+        <input type="number" id="cuat-anio" class="field-input" value="2026" min="2024" max="2040" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Nombre personalizado (opcional)</label>
+        <input type="text" id="cuat-nombre" class="field-input" placeholder="Ej: Cuatrimestre 1 — 2026" />
+      </div>
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Fecha inicio</label>
+          <input type="date" id="cuat-ini" class="field-input" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Fecha fin</label>
+          <input type="date" id="cuat-fin" class="field-input" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-cuatrimestre')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarCuatrimestre()"><i class="fas fa-save"></i> Guardar</button>
+    </div>
+  </div>
+
+  <!-- Modal asignar materias a cuatrimestre -->
+  <div class="modal" id="modal-cuatri-materias">
+    <div class="modal-header">
+      <h3 id="tit-cuatri-mat">Asignar Materias al Cuatrimestre</h3>
+      <button class="modal-close" onclick="closeModal('modal-cuatri-materias')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p id="cuatri-mat-desc" style="font-size:.85rem;color:var(--text-sub);margin-bottom:1rem"></p>
+      <div id="cuatri-mat-checklist" class="materias-checklist"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-cuatri-materias')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarMateriasCuatri()"><i class="fas fa-check"></i> Asignar</button>
+    </div>
+  </div>
+
+  <!-- Modal Campus -->
+  <div class="modal" id="modal-campus">
+    <div class="modal-header">
+      <h3 id="tit-campus">Nuevo Campus</h3>
+      <button class="modal-close" onclick="closeModal('modal-campus')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="camp-id"/>
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Nombre del Campus *</label>
+          <input type="text" id="camp-nombre" class="field-input" placeholder="Campus Norte"/>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Clave única *</label>
+          <input type="text" id="camp-clave" class="field-input" placeholder="MARINA" style="text-transform:uppercase"/>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Ciudad</label>
+          <input type="text" id="camp-ciudad" class="field-input" placeholder="Ciudad de México"/>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Estado</label>
+          <input type="text" id="camp-estado" class="field-input" placeholder="CDMX"/>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Dirección</label>
+        <input type="text" id="camp-dir" class="field-input" placeholder="Calle, número, colonia"/>
+      </div>
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Teléfono</label>
+          <input type="text" id="camp-tel" class="field-input"/>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Email institucional</label>
+          <input type="email" id="camp-email" class="field-input"/>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label"><i class="fas fa-user-tie"></i> Director del Campus</label>
+        <select id="camp-director" class="field-input">
+          <option value="">— Sin director asignado —</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-campus')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarCampus()"><i class="fas fa-save"></i> Guardar</button>
+    </div>
+  </div>
+
+  <!-- Modal Horarios de Materia -->
+  <div class="modal" id="modal-horarios">
+    <div class="modal-header">
+      <h3 id="tit-horarios">Horarios de la Materia</h3>
+      <button class="modal-close" onclick="closeModal('modal-horarios')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="hor-materia-id"/>
+      <div id="lista-horarios" style="margin-bottom:1.2rem"></div>
+      <div class="card" style="background:var(--bg);padding:1rem;border-radius:var(--radius)">
+        <h4 style="font-size:.85rem;font-weight:700;color:var(--text-main);margin-bottom:.8rem"><i class="fas fa-plus"></i> Agregar bloque horario</h4>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="field-group">
+            <label class="field-label">Grupo</label>
+            <select id="hor-grupo" class="field-input"></select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Día</label>
+            <select id="hor-dia" class="field-input">
+              <option value="1">Lunes</option>
+              <option value="2">Martes</option>
+              <option value="3">Miércoles</option>
+              <option value="4">Jueves</option>
+              <option value="5">Viernes</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Aula</label>
+            <input type="text" id="hor-aula" class="field-input" placeholder="Aula 301"/>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="field-group">
+            <label class="field-label">Hora inicio</label>
+            <input type="time" id="hor-ini" class="field-input" value="08:00"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Hora fin</label>
+            <input type="time" id="hor-fin" class="field-input" value="10:00"/>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="agregarHorario()" style="width:100%;margin-top:.3rem">
+          <i class="fas fa-plus"></i> Agregar Horario
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-horarios')">Cerrar</button>
+    </div>
+  </div>
+
+</div><!-- /modal-overlay -->
+
+<div id="toast" class="toast"></div>
+<script src="js/app.js"></script>
+</body>
+</html>

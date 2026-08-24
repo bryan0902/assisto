@@ -1,0 +1,18 @@
+{
+  "name": "assisto",
+  "version": "1.0.0",
+  "description": "Sistema Institucional de Control de Asistencia",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "*",
+    "better-sqlite3": "*",
+    "cors": "*",
+    "dotenv": "^17.4.2",
+    "express": "*",
+    "jsonwebtoken": "*"
+  }
+}
