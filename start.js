@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // ══════════════════════════════════════════════════
 //  ASSISTO — Iniciador rápido
-//  Doble clic en Windows o: node start.js
+//  Doble clic en Windows o: npm start
 // ══════════════════════════════════════════════════
 const { execSync, spawn } = require('child_process');
 const path = require('path');
