@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // ══════════════════════════════════════════════════
-//  EDUTRACK — Iniciador rápido
+//  ASSISTO — Iniciador rápido
 //  Doble clic en Windows o: node start.js
 // ══════════════════════════════════════════════════
 const { execSync, spawn } = require('child_process');
